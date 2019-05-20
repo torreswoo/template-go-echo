@@ -1,0 +1,10 @@
+FROM golang:1.11 AS builder
+COPY . /app/api
+WORKDIR /app/api
+RUN GO111MODULE=auto && go mod download
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -a -installsuffix cgo -o bin/server cmd/server/main.go
+
+FROM scratch
+WORKDIR /app/api
+COPY --from=builder /app/api /app/api
+ENTRYPOINT ["/app/api/bin/server"]

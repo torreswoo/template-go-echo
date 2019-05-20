@@ -1,4 +1,85 @@
+consumes:
+- application/json
 info:
-  contact: {}
-  license: {}
-paths: {}
+  description: serving ab test info to mobile client
+  title: Config API server application
+  version: 1.1.0
+
+paths:
+  /{version}/variation:
+    get:
+      summary: 해당 사용자의 variation을 결정
+      description: user 정보와 실험 정보를 받으면 해당 사용자가 어느 variation에 속한지 결정해서 리턴한다.
+      tags:
+        - config
+      parameters:
+        - in: path
+          name: version
+          description: api version
+          schema:
+            type: string
+      responses:
+        200:
+          description: 해당 사용자의 variation 값
+
+  /{version}/datafile:
+    get:
+      summary: 실험 정보 리턴
+      description: 특정 프로젝트에 존재하는 실험들의 정보를 리턴한다.
+      tags:
+        - config
+      parameters:
+        - in: path
+          name: version
+          description: api version
+          schema:
+            type: string
+        - in: query
+          name: projectkey
+          description: 실험 정보를 조회 할 프로젝트 키
+          schema:
+            type: string
+      responses:
+        200:
+          description: 해당 프로젝트의 실험 정보
+
+  /healthz:
+    get:
+      summary: 서버의 상태 리턴
+      description: 현재 서버가 정상적인 동작이라면 "OK" 문자열을 리턴한다.
+      tags:
+        - default
+      response:
+        200:
+          description: 서버가 정상 상태라면 "OK" 문자열 리턴
+
+  /collect-stat:
+    get:
+      summary: Kafka Producer의 처리량 모니터링
+      description: collect api에서 Kafka 로 전송하는 처리량 통계를 조회하는 api
+      tags:
+        - collect
+      response:
+        200:
+          description: Kafka 전송 통계량, 자세한 정보는 https://github.com/segmentio/kafka-go/blob/master/writer.go#L128 참조
+
+  /{version}/collect:
+    post:
+      summary: app의 이벤트를 http로 수집해서 kafka에 produce
+      description: 각 실험마다 정의된 goal 데이터를 http post로 수집하고 kafka 로 produce 한다.
+      tags:
+        - collect
+      parameters:
+        - in: path
+          name: version
+          description: api version
+          schema:
+            type: string
+      responses:
+        200:
+          description: async로 동작하기 때문에 무조건 200 리턴
+produces:
+- application/json
+schemes:
+- http
+swagger: "2.0"

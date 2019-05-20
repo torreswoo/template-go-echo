@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-api-svc
+  namespace: default
+spec:
+  ports:
+  - port: 3100
+    protocol: TCP
+    targetPort: 3100
+  selector:
+    app: test-api-server
+
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: test-api-server
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: test-api-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: test-api-server
+    spec:
+      containers:
+      - name: test-api-server
+        image: torreswoo/template-go-echo:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 500m
+            memory: 500Mi
+        ports:
+        - containerPort: 3100
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 3100
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 3100
+          initialDelaySeconds: 20
+          periodSeconds: 3
+        env:
+        - name: "SERVER_PORT"
+          value: "3100"
