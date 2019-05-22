@@ -1,0 +1,16 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: torres-ingress
+  namespace: default
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: torres.dev.XXXXX.io
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: test-api-svc
+          servicePort: 80
