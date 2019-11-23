@@ -3,7 +3,7 @@
 ## start up
 ```
 #. use Go version
-$ gvm use go1.11
+$ gvm use go1.13
  
 #. Basic Go mod
 $ go mod init github.com/torreswoo/template-go-echo
@@ -22,6 +22,29 @@ $ go run cmd/server/main.go
 #. make binary & start
 $ go build -o bin/server cmd/server/main.go
 $ bin/server
+```
+
+```bash
+// module
+$ go list -m all
+
+// src file dir
+$ go list ./...
+
+// src file .go
+$ find . -path ./vendor -prune -o -name '*.go' -print
+
+// test
+$ go test $(go list ./... | grep -v /vendor/) -v
+// test - Integration test
+$ go test $(go list ./... | grep -v /vendor/) -v -tags integration 
+// test - benchmark
+$ go test -tags integration -bench=. ./... -benchmem
+
+// style - check 
+$ gofmt -d $(find . -path ./vendor -prune -o -name '*.go' -print)
+// style - do formatting 
+$ go fmt $(go list ./... | grep -v /vendor/)
 ```
 
 ## Docker & k8s
